@@ -88,6 +88,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
       WeatherLoading() => _buildLoadingState(),
       WeatherLoaded() => _buildLoadedState(state),
       WeatherError() => _buildErrorState(state),
+       _ => const SizedBox.shrink(), 
     };
   }
 

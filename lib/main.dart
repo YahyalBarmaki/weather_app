@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:weather_app/presentation/pages/dashboard_page.dart';
 import 'core/di/injection_container.dart' as di;
-import 'presentation/pages/weather_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Load environment variables
   await dotenv.load(fileName: ".env");
-  
-  // Initialize dependency injection
   await di.init();
   
   runApp(const ProviderScope(child: WeatherApp()));
@@ -44,15 +41,14 @@ class WeatherApp extends StatelessWidget {
             ),
           ),
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
-      home: const WeatherPage(),
+      home: const DashBoard(),
     );
   }
 }
-

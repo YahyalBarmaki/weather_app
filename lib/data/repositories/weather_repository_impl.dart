@@ -8,6 +8,7 @@ import '../../domain/entities/weather_entity.dart';
 import '../../domain/repositories/weather_repository.dart';
 import '../datasources/weather_api_service.dart';
 import '../datasources/weather_local_data_source.dart';
+import '../models/weather_model.dart';
 
 class WeatherRepositoryImpl implements WeatherRepository {
   final WeatherApiService apiService;
@@ -52,6 +53,7 @@ class WeatherRepositoryImpl implements WeatherRepository {
   Future<Either<Failure, List<WeatherEntity>>> getMultipleCitiesWeather(List<String> cities) async {
     final List<WeatherEntity> weatherList = [];
     final List<Failure> failures = [];
+    
 
     // Process cities in parallel for better performance
     final futures = cities.map((city) => getCurrentWeather(city));
@@ -153,4 +155,3 @@ class WeatherRepositoryImpl implements WeatherRepository {
 }
 
 // Import the model classes
-import '../models/weather_model.dart';
