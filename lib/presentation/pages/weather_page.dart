@@ -88,6 +88,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
       WeatherLoading() => _buildLoadingState(),
       WeatherLoaded() => _buildLoadedState(state),
       WeatherError() => _buildErrorState(state),
+      // TODO: Handle this case.
+      WeatherState() => throw UnimplementedError(),
     };
   }
 

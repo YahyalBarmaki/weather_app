@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:weather_app/presentation/pages/home_screen.dart';
 import 'core/di/injection_container.dart' as di;
 import 'presentation/pages/weather_page.dart';
 
@@ -44,14 +45,14 @@ class WeatherApp extends StatelessWidget {
             ),
           ),
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
-      home: const WeatherPage(),
+      home: const HomeScreen(),
     );
   }
 }

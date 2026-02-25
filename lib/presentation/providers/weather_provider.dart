@@ -4,6 +4,7 @@ import '../../domain/usecases/get_current_weather.dart';
 import '../../domain/usecases/get_multiple_cities_weather.dart';
 import 'weather_notifier.dart';
 import 'weather_state.dart';
+import '../../domain/entities/weather_entity.dart';
 
 // Use cases providers
 final getCurrentWeatherProvider = Provider<GetCurrentWeather>((ref) {
@@ -58,4 +59,3 @@ final isDataFreshProvider = Provider<bool>((ref) {
 });
 
 // Import the entity for the provider
-import '../../domain/entities/weather_entity.dart';

@@ -8,6 +8,7 @@ import '../../domain/entities/weather_entity.dart';
 import '../../domain/repositories/weather_repository.dart';
 import '../datasources/weather_api_service.dart';
 import '../datasources/weather_local_data_source.dart';
+import '../models/weather_model.dart';
 
 class WeatherRepositoryImpl implements WeatherRepository {
   final WeatherApiService apiService;
@@ -153,4 +154,3 @@ class WeatherRepositoryImpl implements WeatherRepository {
 }
 
 // Import the model classes
-import '../models/weather_model.dart';
