@@ -23,7 +23,7 @@ class WeatherModel extends WeatherEntity {
   @JsonKey(name: 'visibility')
   final int? visibility;
   
-  const WeatherModel({
+  WeatherModel({
     required this.cityName,
     required this.sys,
     required this.main,
