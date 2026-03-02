@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/di/injection_container.dart';
+import '../../domain/entities/weather_entity.dart';
 import '../../domain/usecases/get_current_weather.dart';
 import '../../domain/usecases/get_multiple_cities_weather.dart';
 import 'weather_notifier.dart';
@@ -56,6 +57,3 @@ final isDataFreshProvider = Provider<bool>((ref) {
   }
   return false;
 });
-
-// Import the entity for the provider
-import '../../domain/entities/weather_entity.dart';
