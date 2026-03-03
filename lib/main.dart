@@ -1,58 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'core/di/injection_container.dart' as di;
-import 'presentation/pages/weather_page.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 
-Future<void> main() async {
+import 'providers/theme_provider.dart';
+import 'providers/weather_provider.dart';
+import 'screens/home_screen.dart';
+import 'theme/app_theme.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Load environment variables
-  await dotenv.load(fileName: ".env");
-  
-  // Initialize dependency injection
-  await di.init();
-  
-  runApp(const ProviderScope(child: WeatherApp()));
+  await initializeDateFormatting('fr_FR', null);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+  ));
+  runApp(const WeatherLuxApp());
 }
 
-class WeatherApp extends StatelessWidget {
-  const WeatherApp({super.key});
+class WeatherLuxApp extends StatelessWidget {
+  const WeatherLuxApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Weather App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1976D2),
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF1976D2),
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1976D2),
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        cardTheme: CardTheme(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => WeatherProvider()),
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (_, tp, __) => MaterialApp(
+          title: 'WeatherLux',
+          debugShowCheckedModeBanner: false,
+          theme:      AppTheme.light,
+          darkTheme:  AppTheme.dark,
+          themeMode:  tp.isDark ? ThemeMode.dark : ThemeMode.light,
+          home: const HomeScreen(),
         ),
       ),
-      home: const WeatherPage(),
     );
   }
 }
-
