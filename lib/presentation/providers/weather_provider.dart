@@ -1,61 +1,64 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/di/injection_container.dart';
-import '../../domain/usecases/get_current_weather.dart';
-import '../../domain/usecases/get_multiple_cities_weather.dart';
-import 'weather_notifier.dart';
-import 'weather_state.dart';
+// ============================================================
+//  providers/weather_provider.dart  —  État météo global
+//  idle → loading → success / error
+// ============================================================
 
-// Use cases providers
-final getCurrentWeatherProvider = Provider<GetCurrentWeather>((ref) {
-  return sl<GetCurrentWeather>();
-});
+import 'package:flutter/material.dart';
+import '../models/weather_city.dart';
+import '../services/weather_service.dart';
 
-final getMultipleCitiesWeatherProvider = Provider<GetMultipleCitiesWeather>((ref) {
-  return sl<GetMultipleCitiesWeather>();
-});
+enum LoadingState { idle, loading, success, error }
 
-// Weather state provider
-final weatherProvider = StateNotifierProvider<WeatherNotifier, WeatherState>((ref) {
-  final getCurrentWeather = ref.read(getCurrentWeatherProvider);
-  final getMultipleCitiesWeather = ref.read(getMultipleCitiesWeatherProvider);
-  
-  return WeatherNotifier(
-    getCurrentWeather: getCurrentWeather,
-    getMultipleCitiesWeather: getMultipleCitiesWeather,
-  );
-});
+class WeatherProvider extends ChangeNotifier {
+  LoadingState      _state       = LoadingState.idle;
+  List<WeatherCity> _cities      = [];
+  double            _progress    = 0.0;
+  int               _loadedCount = 0;
+  String            _errorMsg    = '';
 
-// Convenience providers for specific state conditions
-final weatherLoadingProvider = Provider<bool>((ref) {
-  final weatherState = ref.watch(weatherProvider);
-  return weatherState is WeatherLoading;
-});
+  LoadingState      get state        => _state;
+  List<WeatherCity> get cities       => _cities;
+  double            get progress     => _progress;
+  int               get loadedCount  => _loadedCount;
+  String            get errorMessage => _errorMsg;
 
-final weatherListProvider = Provider<List<WeatherEntity>?>((ref) {
-  final weatherState = ref.watch(weatherProvider);
-  if (weatherState is WeatherLoaded) {
-    return weatherState.weatherList;
-  } else if (weatherState is WeatherError && weatherState.hasCachedData) {
-    return weatherState.cachedWeatherList;
+  static const _messages = [
+    'Nous téléchargeons les données…',
+    'C\'est presque fini…',
+    'Plus que quelques secondes avant d\'avoir le résultat…',
+    'Analyse des prévisions en cours…',
+    'Finalisation de votre météo…',
+  ];
+  String get currentMessage =>
+      _messages[_loadedCount.clamp(0, _messages.length - 1)];
+
+  Future<void> loadWeather() async {
+    _state = LoadingState.loading;
+    _progress = 0.0; _loadedCount = 0;
+    _cities = []; _errorMsg = '';
+    notifyListeners();
+
+    try {
+      _cities = await WeatherService.instance.fetchAllCities(
+        onProgress: (loaded, total) {
+          _loadedCount = loaded;
+          _progress    = loaded / total;
+          notifyListeners();
+        },
+      );
+      _progress = 1.0;
+      _state    = LoadingState.success;
+    } catch (e) {
+      _errorMsg = e.toString().replaceFirst('Exception: ', '');
+      _state    = LoadingState.error;
+    }
+    notifyListeners();
   }
-  return null;
-});
 
-final weatherErrorProvider = Provider<String?>((ref) {
-  final weatherState = ref.watch(weatherProvider);
-  if (weatherState is WeatherError) {
-    return weatherState.failure.message;
+  void reset() {
+    _state = LoadingState.idle;
+    _cities = []; _progress = 0.0;
+    _loadedCount = 0; _errorMsg = '';
+    notifyListeners();
   }
-  return null;
-});
-
-final isDataFreshProvider = Provider<bool>((ref) {
-  final weatherState = ref.watch(weatherProvider);
-  if (weatherState is WeatherLoaded) {
-    return weatherState.isDataFresh;
-  }
-  return false;
-});
-
-// Import the entity for the provider
-import '../../domain/entities/weather_entity.dart';
+}

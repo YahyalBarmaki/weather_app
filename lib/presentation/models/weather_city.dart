@@ -1,3 +1,7 @@
+// ============================================================
+//  models/weather_city.dart  —  Modèle météo d'une ville
+// ============================================================
+
 class WeatherCity {
   final String city;
   final String country;

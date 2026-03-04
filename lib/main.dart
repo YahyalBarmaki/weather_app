@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'providers/theme_provider.dart';
-import 'providers/weather_provider.dart';
-import 'screens/home_screen.dart';
-import 'theme/app_theme.dart';
+import 'presentation/providers/theme_provider.dart';
+import 'presentation/providers/weather_provider.dart';
+import 'presentation/pages/home_screen.dart';
+import 'presentation/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,7 @@ void main() async {
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
   ));
+  await dotenv.load(fileName: ".env");
   runApp(const WeatherLuxApp());
 }
 

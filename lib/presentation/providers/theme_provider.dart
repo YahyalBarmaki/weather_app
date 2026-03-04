@@ -1,3 +1,7 @@
+// ============================================================
+//  providers/theme_provider.dart  —  Gestion Dark / Light
+// ============================================================
+
 import 'package:flutter/material.dart';
 
 class ThemeProvider extends ChangeNotifier {
