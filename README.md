@@ -207,6 +207,12 @@ flutter packages pub run build_runner build --delete-conflicting-outputs
 - [ ] Graphiques de tendances météo
 - [ ] Support de plusieurs langues
 
+## 👥 Contributeurs
+
+- **Awa Astou CISSOKHO**
+- **Cheikh haji Maodo Malick BA**
+- **Yaya LY**
+
 ## 🤝 Contribution
 
 1. Fork le projet
