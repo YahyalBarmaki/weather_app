@@ -1,4 +1,5 @@
-
+import 'package:flutter/material.dart';
+import '../../domain/entities/weather_entity.dart';
 class WeatherCard extends StatelessWidget {
   final WeatherEntity weather;
   final VoidCallback? onRefresh;
