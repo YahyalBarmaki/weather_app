@@ -5,7 +5,7 @@ part 'weather_model.g.dart';
 
 @JsonSerializable()
 class WeatherModel extends WeatherEntity {
-  @JsonKey(name: 'name')
+ // @JsonKey(name: 'name')
   final String cityName;
   
   @JsonKey(name: 'sys')
@@ -50,6 +50,7 @@ class WeatherModel extends WeatherEntity {
   Map<String, dynamic> toJson() => _$WeatherModelToJson(this);
   
   WeatherEntity toEntity() {
+     print('toEntity cityName: $cityName, country: ${sys.country}');
     return WeatherEntity(
       cityName: cityName,
       country: sys.country,

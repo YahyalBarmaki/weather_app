@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/di/injection_container.dart' as di;
+import 'presentation/pages/weather_page.dart';
 
 import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/weather_provider.dart';

@@ -29,6 +29,7 @@ class DioClient {
       queryParameters: {
         'appid': dotenv.env['OPEN_WEATHER_API_KEY'] ?? '',
         'units': AppConstants.units,
+        'lang':'fr',
       },
     );
     

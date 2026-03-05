@@ -53,6 +53,7 @@ class WeatherRepositoryImpl implements WeatherRepository {
   Future<Either<Failure, List<WeatherEntity>>> getMultipleCitiesWeather(List<String> cities) async {
     final List<WeatherEntity> weatherList = [];
     final List<Failure> failures = [];
+    
 
     // Process cities in parallel for better performance
     final futures = cities.map((city) => getCurrentWeather(city));

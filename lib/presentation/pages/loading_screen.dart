@@ -6,6 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:weather_app/presentation/pages/boune_dot.dart';
+import 'package:weather_app/presentation/pages/circle_gauge.dart';
+import 'package:weather_app/presentation/pages/linear_bar.dart';
+import 'package:weather_app/presentation/pages/result_button.dart';
+import 'package:weather_app/presentation/pages/retry_button.dart';
 
 import '../providers/theme_provider.dart';
 import '../providers/weather_provider.dart';
@@ -82,7 +87,7 @@ class _LoadingScreenState extends State<LoadingScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _CircleGauge(progress: wp.progress, pct: pct, dark: dark,
+                CircleGauge(progress: wp.progress, pct: pct, dark: dark,
                     done: done, onTap: done ? _goToDashboard : null)
                     .animate().fadeIn(duration: 600.ms)
                     .scale(begin: const Offset(0.75, 0.75)),
@@ -106,17 +111,17 @@ class _LoadingScreenState extends State<LoadingScreen>
                 ),
 
                 const SizedBox(height: 22),
-                if (!done && !err) _BounceDots(ctrl: _dotsCtrl),
+                if (!done && !err) BounceDots(ctrl: _dotsCtrl),
                 const SizedBox(height: 44),
 
-                _LinearBar(progress: wp.progress, done: done),
+                LinearBar(progress: wp.progress, done: done),
                 const SizedBox(height: 36),
 
                 if (done)
-                  _ResultButton(onTap: _goToDashboard)
+                  ResultButton(onTap: _goToDashboard)
                       .animate().fadeIn(duration: 500.ms).slideY(begin: 0.3),
                 if (err)
-                  _RetryButton(dark: dark, onTap: _retry)
+                  RetryButton(dark: dark, onTap: _retry)
                       .animate().fadeIn().slideY(begin: 0.3),
               ],
             ),
@@ -125,183 +130,4 @@ class _LoadingScreenState extends State<LoadingScreen>
       ),
     );
   }
-}
-
-// ── Jauge circulaire ─────────────────────────────────────────
-
-class _CircleGauge extends StatelessWidget {
-  final double progress; final int pct;
-  final bool dark, done; final VoidCallback? onTap;
-  const _CircleGauge({required this.progress, required this.pct,
-    required this.dark, required this.done, this.onTap});
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: SizedBox(width: 200, height: 200,
-      child: Stack(alignment: Alignment.center, children: [
-        Container(width: 200, height: 200, decoration: BoxDecoration(
-          shape: BoxShape.circle, boxShadow: [BoxShadow(
-            color: (done ? AppTheme.cGreen : AppTheme.cIndigo).withOpacity(0.35),
-            blurRadius: 50, spreadRadius: 12)])),
-        CustomPaint(size: const Size(200, 200),
-            painter: _ArcPainter(progress: progress, done: done)),
-        GlassCard(radius: 90, width: 144, height: 144, padding: EdgeInsets.zero,
-          child: Center(child: done
-            ? Column(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.check_circle_rounded, color: AppTheme.cGreen, size: 40),
-                const SizedBox(height: 4),
-                Text('Appuyer', style: GoogleFonts.outfit(
-                    color: AppTheme.cGreen, fontSize: 12,
-                    fontWeight: FontWeight.w600)),
-              ])
-            : AnimatedSwitcher(
-                duration: const Duration(milliseconds: 180),
-                child: Text('$pct%', key: ValueKey(pct),
-                  style: GoogleFonts.outfit(color: AppTheme.textPrimary(dark),
-                      fontSize: 40, fontWeight: FontWeight.w800)),
-              ),
-          )),
-      ]),
-    ),
-  );
-}
-
-class _ArcPainter extends CustomPainter {
-  final double progress; final bool done;
-  const _ArcPainter({required this.progress, required this.done});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final r = size.width / 2 - 10;
-    canvas.drawCircle(c, r, Paint()
-      ..color = Colors.white.withOpacity(0.08)
-      ..strokeWidth = 9 ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round);
-    canvas.drawArc(
-      Rect.fromCircle(center: c, radius: r), -pi / 2, 2 * pi * progress, false,
-      Paint()
-        ..shader = SweepGradient(
-          startAngle: -pi / 2, endAngle: 3 * pi / 2,
-          colors: done
-              ? [const Color(0xFF00E676), const Color(0xFF69F0AE)]
-              : [const Color(0xFF6C63FF), const Color(0xFF00E5FF), const Color(0xFF7B5EA7)],
-        ).createShader(Rect.fromCircle(center: c, radius: r))
-        ..strokeWidth = 9 ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round,
-    );
-    if (progress > 0.02) {
-      final angle = -pi / 2 + 2 * pi * progress;
-      final dx = c.dx + r * cos(angle);
-      final dy = c.dy + r * sin(angle);
-      final dot = done ? const Color(0xFF00E676) : const Color(0xFF00E5FF);
-      canvas.drawCircle(Offset(dx, dy), 7,
-          Paint()..color = dot ..style = PaintingStyle.fill);
-      canvas.drawCircle(Offset(dx, dy), 14,
-          Paint()..color = dot.withOpacity(0.35) ..style = PaintingStyle.fill);
-    }
-  }
-
-  @override bool shouldRepaint(_ArcPainter o) =>
-      o.progress != progress || o.done != done;
-}
-
-// ── Points bounce ────────────────────────────────────────────
-
-class _BounceDots extends StatelessWidget {
-  final AnimationController ctrl;
-  const _BounceDots({required this.ctrl});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = [AppTheme.cIndigo, AppTheme.cCyan, AppTheme.cViolet];
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(3, (i) => AnimatedBuilder(
-        animation: ctrl,
-        builder: (_, __) => Transform.scale(
-          scale: 0.6 + 0.8 * sin(((ctrl.value + i * 0.33) % 1.0) * pi),
-          child: Container(width: 9, height: 9,
-            margin: const EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(shape: BoxShape.circle, color: colors[i])),
-        ),
-      )),
-    );
-  }
-}
-
-// ── Barre linéaire ────────────────────────────────────────────
-
-class _LinearBar extends StatelessWidget {
-  final double progress; final bool done;
-  const _LinearBar({required this.progress, required this.done});
-
-  @override
-  Widget build(BuildContext context) => Stack(children: [
-    Container(height: 7, decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(4),
-      color: Colors.white.withOpacity(0.10))),
-    AnimatedFractionallySizedBox(
-      duration: const Duration(milliseconds: 450),
-      widthFactor: progress,
-      child: Container(height: 7, decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
-        gradient: done ? AppTheme.gradGreen : AppTheme.gradCyan,
-        boxShadow: [BoxShadow(
-          color: (done ? AppTheme.cGreen : AppTheme.cCyan).withOpacity(0.55),
-          blurRadius: 10)]))),
-  ]);
-}
-
-// ── Bouton Voir les résultats ─────────────────────────────────
-
-class _ResultButton extends StatelessWidget {
-  final VoidCallback onTap;
-  const _ResultButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      width: double.infinity, height: 56,
-      decoration: BoxDecoration(
-        gradient: AppTheme.gradGreen,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [BoxShadow(color: AppTheme.cGreen.withOpacity(0.45),
-            blurRadius: 24, offset: const Offset(0, 10))]),
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const Icon(Icons.dashboard_rounded, color: Colors.white, size: 22),
-        const SizedBox(width: 10),
-        Text('Voir les résultats  🎉', style: GoogleFonts.outfit(
-            color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)),
-      ]),
-    ),
-  );
-}
-
-// ── Bouton Réessayer ──────────────────────────────────────────
-
-class _RetryButton extends StatelessWidget {
-  final bool dark; final VoidCallback onTap;
-  const _RetryButton({required this.dark, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 15),
-      decoration: BoxDecoration(
-        gradient: AppTheme.gradPurple,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: AppTheme.cIndigo.withOpacity(0.45),
-            blurRadius: 22, offset: const Offset(0, 8))]),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
-        const SizedBox(width: 10),
-        Text('Réessayer', style: GoogleFonts.outfit(
-            color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-      ]),
-    ),
-  );
 }
