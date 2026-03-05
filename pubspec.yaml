@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  url_launcher: ^6.2.5
+
 
   # State Management
   flutter_riverpod: ^2.4.9
@@ -56,11 +58,14 @@ dependencies:
   
   # UI
   cupertino_icons: ^1.0.8
+  google_fonts: ^8.0.2
+  provider: ^6.1.2
   
   # Utilities
   equatable: ^2.0.5
-  google_fonts: ^8.0.2
+ 
   intl: ^0.20.2
+  flutter_animate: ^4.5.0
 
 dev_dependencies:
   flutter_test:
